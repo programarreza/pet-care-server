@@ -35,7 +35,7 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     image: {
       type: String,
-      require: true,
+      default: null,
     },
     isActive: {
       type: Boolean,

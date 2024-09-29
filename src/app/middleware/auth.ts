@@ -10,16 +10,12 @@ const auth = (...requiredRoles: TUserRole[]) => {
   return catchAsync(async (req, res, next) => {
     const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      throw new AppError(httpStatus.UNAUTHORIZED, "You have no access to this route");
-    }
-
     // Extract token from header
-    const token  = authHeader.split(" ")[1]
+    const token = authHeader;
 
     // check token validity
     const decoded = jwt.verify(
-      token,
+      token as string,
       config.jwt_access_secret as string
     ) as JwtPayload;
 
@@ -31,9 +27,12 @@ const auth = (...requiredRoles: TUserRole[]) => {
       throw new AppError(httpStatus.NOT_FOUND, "This user is not found!");
     }
 
-    // check if the role is permitted 
+    // check if the role is permitted
     if (requiredRoles.length && !requiredRoles.includes(role)) {
-      throw new AppError(httpStatus.UNAUTHORIZED, "You have no access to this route");
+      throw new AppError(
+        httpStatus.UNAUTHORIZED,
+        "You have no access to this route"
+      );
     }
 
     req.user = decoded as JwtPayload;

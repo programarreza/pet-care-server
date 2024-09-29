@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { Model } from "mongoose";
 import { USER_ROLE } from "./user.constant";
 
