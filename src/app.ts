@@ -1,9 +1,10 @@
 import cookieParser from "cookie-parser";
-import express, { Application, Request, Response } from "express";
-const app: Application = express();
 import cors from "cors";
-import userRoutes from "./app/modules/user/user.route";
+import express, { Application, Request, Response } from "express";
+import globalErrorHandler from "./app/middleware/globalErrorHandler";
 import authRoutes from "./app/modules/auth/auth.route";
+import userRoutes from "./app/modules/user/user.route";
+const app: Application = express();
 
 // parsers
 app.use(express.json());
@@ -22,5 +23,7 @@ app.use("/api/v1/auth", authRoutes);
 app.get("/", (req: Request, res: Response) => {
   res.send("Welcome to pet-care server");
 });
+
+app.use(globalErrorHandler);
 
 export default app;
