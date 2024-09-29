@@ -5,7 +5,10 @@ import { AuthServices } from "./auth.service";
 import config from "../../config";
 
 const signup = catchAsync(async (req, res) => {
-  const result = await AuthServices.signup(req.body);
+  const result = await AuthServices.signup({
+    ...req.body,
+    image: req.file?.path,
+  });
 
   sendResponse(res, {
     success: true,

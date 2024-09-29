@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ErrorRequestHandler } from "express";
 import { ZodError } from "zod";
 import config from "../config";
@@ -36,12 +35,14 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     errorMessages = [{ path: "", message: err.message }];
   }
 
-  return res.status(statusCode).json({
+  res.status(statusCode).json({
     success: false,
     message,
     errorMessages,
     stack: config.NODE_ENV === "development" ? err.stack : null,
   });
+
+  next();
 };
 
 export default globalErrorHandler;
