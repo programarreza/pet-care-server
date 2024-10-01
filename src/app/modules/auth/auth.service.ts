@@ -34,7 +34,9 @@ const login = async (payload: TLoginUser) => {
     email: user?.email,
     phone: user?.phone,
     image: user?.image,
-    isActive: user?.isActive,
+    status: user?.status,
+    flowers: user?.flowers,
+    flowing: user?.flowing,
     role: user?.role,
   };
 
@@ -52,20 +54,9 @@ const login = async (payload: TLoginUser) => {
     config.jwt_refresh_expires_in as string
   );
 
-  // Create a new object without including the password field
-  const userData = {
-    _id: user._id,
-    name: user.name,
-    email: user.email,
-    phone: user.phone,
-    address: user.address,
-    role: user.role,
-  };
-
   return {
     accessToken,
     refreshToken,
-    user: userData,
   };
 };
 
@@ -87,10 +78,11 @@ const refreshToken = async (token: string) => {
     email: user?.email,
     phone: user?.phone,
     image: user?.image,
-    isActive: user?.isActive,
+    status: user?.status,
+    flowers: user?.flowers,
+    flowing: user?.flowing,
     role: user?.role,
   };
-
 
   // create token and send to the client
   const accessToken = createToken(
