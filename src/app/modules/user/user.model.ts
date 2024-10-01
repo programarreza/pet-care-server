@@ -45,14 +45,14 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     flowers: [
       {
-        type: Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "User",
         default: [],
       },
     ],
     flowing: [
       {
-        type: Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "User",
         default: [],
       },
@@ -69,6 +69,35 @@ const userSchema = new Schema<TUser, UserModel>(
   { timestamps: true }
 );
 
+// Middleware to check access to blocked users
+function checkAccessForBlockedUsers(this: any, next: any) {
+  // Check if the user querying is an admin
+  const currentUser = this.getOptions().user; // Assuming user context is passed in options
+  if (currentUser?.role !== USER_ROLE.ADMIN) {
+    this.find({ isBlock: { $ne: true } }); // Non-admins cannot access blocked users
+  }
+
+  // Ensure deleted users are also excluded
+  this.find({ isDeleted: { $ne: true } });
+  next();
+}
+
+userSchema.pre("find", checkAccessForBlockedUsers);
+userSchema.pre("findOne", checkAccessForBlockedUsers);
+userSchema.pre("aggregate", function (next) {
+  const currentUser = this.options.user; // Assuming user context is passed in options
+
+  if (currentUser?.role !== USER_ROLE.ADMIN) {
+    // Add match condition for non-admins to exclude blocked users
+    this.pipeline().unshift({ $match: { isBlock: { $ne: true } } });
+  }
+
+  // Exclude deleted users in aggregation
+  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+
+  next();
+});
+
 userSchema.pre("save", async function (next) {
   const user = this;
 
@@ -80,7 +109,7 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-// set '' ofter saving password
+// set '' after saving password
 userSchema.post("save", function (doc, next) {
   doc.password = "";
   next();
@@ -96,20 +125,5 @@ userSchema.statics.isPasswordMatched = async function (
 ) {
   return await bcrypt.compare(plainTextPassword, hashedPassword);
 };
-
-userSchema.pre("find", async function (next) {
-  this.find({ isDeleted: { $ne: true } });
-  next();
-});
-
-userSchema.pre("findOne", async function (next) {
-  this.find({ isDeleted: { $ne: true } });
-  next();
-});
-
-userSchema.pre("aggregate", function (next) {
-  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
-  next();
-});
 
 export const User = model<TUser, UserModel>("User", userSchema);
