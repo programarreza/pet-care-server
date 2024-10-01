@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { multerUpload } from "../../config/multer.config";
 import validateRequest from "../../middleware/validateRequest";
-import { createContent } from "./content.controller";
+import { createContent, getAllContent } from "./content.controller";
 import { createContentValidationSchema } from "./content.validation";
 import { USER_ROLE } from "../user/user.constant";
 import auth from "../../middleware/auth";
@@ -19,4 +19,7 @@ contentRoutes.post(
   validateRequest(createContentValidationSchema),
   createContent
 );
+
+contentRoutes.get("/", getAllContent);
+
 export default contentRoutes;

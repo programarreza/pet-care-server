@@ -17,4 +17,14 @@ const createContentIntoDB = async (payload: TContent) => {
   return populateContent;
 };
 
-export { createContentIntoDB };
+const getAllContentFromDB = async () => {
+  const result = await Content.find().populate("user");
+
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, "Content not found!");
+  }
+
+  return result;
+};
+
+export { createContentIntoDB, getAllContentFromDB };
