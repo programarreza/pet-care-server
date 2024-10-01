@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Model } from "mongoose";
+import { Model, Types } from "mongoose";
 import { USER_ROLE } from "./user.constant";
 
 export type TRole = "USER" | "ADMIN";
@@ -12,9 +12,12 @@ export type TUser = {
   phone: string;
   address: string;
   image: string;
-  isActive: boolean;
+  status: "BASIC" | "PREMIUM";
+  isBlock: boolean;
   isDeleted: boolean;
   role: TRole;
+  flowers: Types.ObjectId[];
+  flowing: Types.ObjectId[];
 };
 
 export interface UserModel extends Model<TUser> {

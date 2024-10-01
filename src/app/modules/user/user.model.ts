@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import bcrypt from "bcrypt";
-import { Schema, model } from "mongoose";
+import { Schema, Types, model } from "mongoose";
 import config from "../../config";
 import { TUser, UserModel } from "./user.interface";
 import { USER_ROLE } from "./user.constant";
@@ -32,14 +32,34 @@ const userSchema = new Schema<TUser, UserModel>(
     role: {
       type: String,
       default: USER_ROLE.USER,
+      enum: [USER_ROLE.USER, USER_ROLE.ADMIN],
     },
     image: {
       type: String,
       default: null,
     },
-    isActive: {
+    status: {
+      type: String,
+      default: "BASIC",
+      enum: ["BASIC", "PREMIUM"],
+    },
+    flowers: [
+      {
+        type: Types.ObjectId,
+        ref: "User",
+        default: [],
+      },
+    ],
+    flowing: [
+      {
+        type: Types.ObjectId,
+        ref: "User",
+        default: [],
+      },
+    ],
+    isBlock: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     isDeleted: {
       type: Boolean,
