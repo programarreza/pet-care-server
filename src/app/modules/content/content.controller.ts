@@ -1,7 +1,11 @@
 import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
-import { createContentIntoDB, getAllContentFromDB } from "./content.service";
+import {
+  createContentIntoDB,
+  getAllContentFromDB,
+  getMyContentsFromDB,
+} from "./content.service";
 
 const createContent = catchAsync(async (req, res) => {
   const result = await createContentIntoDB({
@@ -28,4 +32,16 @@ const getAllContent = catchAsync(async (req, res) => {
   });
 });
 
-export { createContent, getAllContent };
+const getMyContents = catchAsync(async (req, res) => {
+  const email = req.user.email;
+  const result = await getMyContentsFromDB(email);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "My Contents is retrieved successfully",
+    data: result,
+  });
+});
+
+export { createContent, getAllContent, getMyContents };

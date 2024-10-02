@@ -27,4 +27,17 @@ const getAllContentFromDB = async () => {
   return result;
 };
 
-export { createContentIntoDB, getAllContentFromDB };
+const getMyContentsFromDB = async (email: string) => {
+  const result = await Content.find().populate({
+    path: "user",
+    match: { email: email }, // Filters based on email during population
+  });
+
+  if (!result || result.length === 0) {
+    throw new AppError(httpStatus.NOT_FOUND, "Content not found!");
+  }
+
+  return result.filter((content) => content.user !== null); // Ensures only content with matched users is returned
+};
+
+export { createContentIntoDB, getAllContentFromDB, getMyContentsFromDB };
