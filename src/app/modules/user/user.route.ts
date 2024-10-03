@@ -14,7 +14,9 @@ import { updateUserValidationSchema } from "./user.validation";
 const userRoutes = Router();
 
 userRoutes.get("/me", auth(USER_ROLE.USER, USER_ROLE.ADMIN), getUserProfile);
-userRoutes.get("/", auth(USER_ROLE.ADMIN), getAllUser);
+userRoutes.get("/", 
+  // auth(USER_ROLE.ADMIN), 
+  getAllUser);
 
 userRoutes.put(
   "/me",
