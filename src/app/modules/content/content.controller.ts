@@ -33,8 +33,8 @@ const getAllContent = catchAsync(async (req, res) => {
 });
 
 const getMyContents = catchAsync(async (req, res) => {
-  const email = req.user.email;
-  const result = await getMyContentsFromDB(email);
+  const { email } = req.query;
+  const result = await getMyContentsFromDB(email as string);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
