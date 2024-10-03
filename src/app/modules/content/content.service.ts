@@ -3,6 +3,7 @@ import AppError from "../../errors/AppError";
 import { User } from "../user/user.model";
 import { TContent } from "./content.interface";
 import { Content } from "./content.model";
+import { QueryBuilder } from "../../builder/QueryBuilder";
 
 const createContentIntoDB = async (payload: TContent) => {
   const userExist = await User.findById(payload.user);
@@ -17,8 +18,14 @@ const createContentIntoDB = async (payload: TContent) => {
   return populateContent;
 };
 
-const getAllContentFromDB = async () => {
-  const result = await Content.find().populate("user");
+const getAllContentFromDB = async (query: Record<string, unknown>) => {
+  const itemQuery = new QueryBuilder(Content.find().populate("user"), query)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await itemQuery.modelQuery;
 
   if (!result) {
     throw new AppError(httpStatus.NOT_FOUND, "Content not found!");
@@ -28,10 +35,12 @@ const getAllContentFromDB = async () => {
 };
 
 const getMyContentsFromDB = async (email: string) => {
-  const result = await Content.find().populate({
-    path: "user",
-    match: { email: email }, // Filters based on email during population
-  });
+  const result = await Content.find()
+    .populate({
+      path: "user",
+      match: { email: email }, // Filters based on email during population
+    })
+    .sort({ createdAt: -1 });
 
   if (!result || result.length === 0) {
     throw new AppError(httpStatus.NOT_FOUND, "Content not found!");

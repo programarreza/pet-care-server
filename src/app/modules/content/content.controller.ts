@@ -22,7 +22,7 @@ const createContent = catchAsync(async (req, res) => {
 });
 
 const getAllContent = catchAsync(async (req, res) => {
-  const result = await getAllContentFromDB();
+  const result = await getAllContentFromDB(req.query);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
