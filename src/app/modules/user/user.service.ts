@@ -215,6 +215,26 @@ const updateBlockStatusIntoDB = async (id: string, isBlock: boolean) => {
   return result;
 };
 
+const updateUserStatusFromDB = async (id: string, status: string) => {
+  const user = await User.findById(id);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found!");
+  }
+
+  // Validate status update
+  const validStatuses = ["BASIC", "PREMIUM"];
+  if (!validStatuses.includes(status)) {
+    throw new AppError(httpStatus.BAD_REQUEST, `Invalid status: ${status}`);
+  }
+
+  const result = await User.findByIdAndUpdate(
+    id,
+    { status: status },
+    { new: true }
+  );
+  return result;
+};
+
 export {
   getUserProfileFromDB,
   updateUserProfileFromDB,
@@ -224,4 +244,5 @@ export {
   createFollowingIntoDB,
   unfollowUserFromDB,
   updateBlockStatusIntoDB,
+  updateUserStatusFromDB,
 };

@@ -11,6 +11,7 @@ import {
   updateBlockStatus,
   updateUser,
   updateUserProfile,
+  updateUserStatus,
 } from "./user.controller";
 import { updateUserValidationSchema } from "./user.validation";
 
@@ -57,8 +58,14 @@ userRoutes.post(
 
 userRoutes.patch(
   "/block-status/:id",
-  // auth(USER_ROLE.USER),
+  // auth(USER_ROLE.ADMIN),
   updateBlockStatus
+);
+
+userRoutes.patch(
+  "/status/:id",
+  // auth(USER_ROLE.ADMIN),
+  updateUserStatus
 );
 
 export default userRoutes;
