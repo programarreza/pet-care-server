@@ -5,7 +5,9 @@ import { TUser } from "./user.interface";
 import mongoose from "mongoose";
 
 const getUserProfileFromDB = async (email: string) => {
-  const result = await User.findOne({ email: email });
+  const result = await User.findOne({ email: email })
+    .populate("following")
+    .populate("followers");
 
   if (!result) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found !");
@@ -198,6 +200,21 @@ const unfollowUserFromDB = async (userId: string, followingId: string) => {
   }
 };
 
+const updateBlockStatusIntoDB = async (id: string, isBlock: boolean) => {
+  const user = await User.findById(id);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found!");
+  }
+
+  const result = await User.findByIdAndUpdate(
+    id,
+    { isBlock: isBlock },
+    { new: true }
+  );
+
+  return result;
+};
+
 export {
   getUserProfileFromDB,
   updateUserProfileFromDB,
@@ -206,4 +223,5 @@ export {
   deleteUserFromDB,
   createFollowingIntoDB,
   unfollowUserFromDB,
+  updateBlockStatusIntoDB,
 };

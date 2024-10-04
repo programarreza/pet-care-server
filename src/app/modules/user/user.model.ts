@@ -71,32 +71,18 @@ const userSchema = new Schema<TUser, UserModel>(
   { timestamps: true }
 );
 
-// Middleware to check access to blocked users
-function checkAccessForBlockedUsers(this: any, next: any) {
-  // Check if the user querying is an admin
-  const currentUser = this.getOptions().user; // Assuming user context is passed in options
-  if (currentUser?.role !== USER_ROLE.ADMIN) {
-    this.find({ isBlock: { $ne: true } }); // Non-admins cannot access blocked users
-  }
-
-  // Ensure deleted users are also excluded
+// Middleware to ensure deleted users are excluded
+function checkAccessForDeletedUsers(this: any, next: any) {
+  // Ensure deleted users are excluded
   this.find({ isDeleted: { $ne: true } });
   next();
 }
 
-userSchema.pre("find", checkAccessForBlockedUsers);
-userSchema.pre("findOne", checkAccessForBlockedUsers);
+userSchema.pre("find", checkAccessForDeletedUsers);
+userSchema.pre("findOne", checkAccessForDeletedUsers);
 userSchema.pre("aggregate", function (next) {
-  const currentUser = this.options.user; // Assuming user context is passed in options
-
-  if (currentUser?.role !== USER_ROLE.ADMIN) {
-    // Add match condition for non-admins to exclude blocked users
-    this.pipeline().unshift({ $match: { isBlock: { $ne: true } } });
-  }
-
   // Exclude deleted users in aggregation
   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
-
   next();
 });
 
@@ -129,7 +115,7 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-// set '' after saving password
+// Set '' after saving password
 userSchema.post("save", function (doc, next) {
   doc.password = "";
   next();

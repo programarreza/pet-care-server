@@ -8,6 +8,7 @@ import {
   getAllUser,
   getUserProfile,
   unFollowUser,
+  updateBlockStatus,
   updateUser,
   updateUserProfile,
 } from "./user.controller";
@@ -52,6 +53,12 @@ userRoutes.post(
   "/un-follow",
   // auth(USER_ROLE.USER),
   unFollowUser
+);
+
+userRoutes.patch(
+  "/block-status/:id",
+  // auth(USER_ROLE.USER),
+  updateBlockStatus
 );
 
 export default userRoutes;
