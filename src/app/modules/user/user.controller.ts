@@ -6,6 +6,7 @@ import {
   deleteUserFromDB,
   getAllUserFromDB,
   getUserProfileFromDB,
+  unfollowUserFromDB,
   updateUserFromDB,
   updateUserProfileFromDB,
 } from "./user.service";
@@ -82,6 +83,19 @@ const followUser = catchAsync(async (req, res) => {
   });
 });
 
+const unFollowUser = catchAsync(async (req, res) => {
+  const { userId, followingId } = req.body;
+
+  const result = await unfollowUserFromDB(userId, followingId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User unfollow successfully",
+    data: result,
+  });
+});
+
 export {
   getUserProfile,
   updateUserProfile,
@@ -89,4 +103,5 @@ export {
   updateUser,
   deleteUser,
   followUser,
+  unFollowUser,
 };

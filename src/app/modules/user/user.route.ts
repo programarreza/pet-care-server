@@ -7,6 +7,7 @@ import {
   followUser,
   getAllUser,
   getUserProfile,
+  unFollowUser,
   updateUser,
   updateUserProfile,
 } from "./user.controller";
@@ -45,6 +46,12 @@ userRoutes.post(
   "/follow",
   // auth(USER_ROLE.USER),
   followUser
+);
+
+userRoutes.post(
+  "/un-follow",
+  // auth(USER_ROLE.USER),
+  unFollowUser
 );
 
 export default userRoutes;

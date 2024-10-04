@@ -113,7 +113,8 @@ const createFollowingIntoDB = async (userId: string, followingId: string) => {
     const followingObjectId = new mongoose.Types.ObjectId(followingId);
 
     const currentUser = await User.findById(userObjectId).session(session);
-    const userToFollow = await User.findById(followingObjectId).session(session);
+    const userToFollow =
+      await User.findById(followingObjectId).session(session);
 
     if (!currentUser || !userToFollow) {
       throw new AppError(httpStatus.NOT_FOUND, "User not found");
@@ -131,14 +132,12 @@ const createFollowingIntoDB = async (userId: string, followingId: string) => {
     await currentUser.save({ session });
     await userToFollow.save({ session });
 
-  
     await session.commitTransaction();
     session.endSession();
 
-
     const updatedUser = await User.findById(userObjectId)
       .populate("following")
-      .populate("followers") 
+      .populate("followers")
       .lean();
 
     return updatedUser;
@@ -149,6 +148,56 @@ const createFollowingIntoDB = async (userId: string, followingId: string) => {
     throw error;
   }
 };
+
+const unfollowUserFromDB = async (userId: string, followingId: string) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    const followingObjectId = new mongoose.Types.ObjectId(followingId);
+
+    // Find the current user and the user to unfollow
+    const currentUser = await User.findById(userObjectId).session(session);
+    const userToUnfollow =
+      await User.findById(followingObjectId).session(session);
+
+    console.log({ currentUser, userToUnfollow });
+
+    if (!currentUser || !userToUnfollow) {
+      throw new AppError(httpStatus.NOT_FOUND, "User not found");
+    }
+
+    if (!currentUser.following.includes(followingObjectId)) {
+      throw new AppError(
+        httpStatus.CONFLICT,
+        "You are not following this user"
+      );
+    }
+
+    // Remove the following relationship
+    currentUser.following = currentUser.following.filter(
+      (id) => !id.equals(followingObjectId)
+    );
+    userToUnfollow.followers = userToUnfollow.followers.filter(
+      (id) => !id.equals(userObjectId)
+    );
+
+    // Save both users
+    await currentUser.save({ session });
+    await userToUnfollow.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return currentUser;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
+};
+
 export {
   getUserProfileFromDB,
   updateUserProfileFromDB,
@@ -156,4 +205,5 @@ export {
   updateUserFromDB,
   deleteUserFromDB,
   createFollowingIntoDB,
+  unfollowUserFromDB,
 };
