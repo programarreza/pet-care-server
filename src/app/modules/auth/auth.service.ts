@@ -36,8 +36,8 @@ const login = async (payload: TLoginUser) => {
     phone: user?.phone,
     image: user?.image,
     status: user?.status,
-    flowers: user?.flowers,
-    flowing: user?.flowing,
+    followers: user?.followers,
+    following: user?.following,
     role: user?.role,
     address: user?.address,
   };
@@ -82,8 +82,8 @@ const refreshToken = async (token: string) => {
     phone: user?.phone,
     image: user?.image,
     status: user?.status,
-    flowers: user?.flowers,
-    flowing: user?.flowing,
+    followers: user?.followers,
+    following: user?.following,
     role: user?.role,
     address: user?.address,
   };

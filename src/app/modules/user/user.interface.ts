@@ -16,8 +16,8 @@ export type TUser = {
   isBlock: boolean;
   isDeleted: boolean;
   role: TRole;
-  flowers: Types.ObjectId[];
-  flowing: Types.ObjectId[];
+  followers: Types.ObjectId[];
+  following: Types.ObjectId[];
 };
 
 export interface UserModel extends Model<TUser> {

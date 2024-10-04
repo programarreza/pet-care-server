@@ -4,6 +4,8 @@ import { Schema, Types, model } from "mongoose";
 import config from "../../config";
 import { TUser, UserModel } from "./user.interface";
 import { USER_ROLE } from "./user.constant";
+import AppError from "../../errors/AppError";
+import httpStatus from "http-status";
 
 const userSchema = new Schema<TUser, UserModel>(
   {
@@ -43,14 +45,14 @@ const userSchema = new Schema<TUser, UserModel>(
       default: "BASIC",
       enum: ["BASIC", "PREMIUM"],
     },
-    flowers: [
+    followers: [
       {
         type: Schema.Types.ObjectId,
         ref: "User",
         default: [],
       },
     ],
-    flowing: [
+    following: [
       {
         type: Schema.Types.ObjectId,
         ref: "User",
@@ -101,12 +103,30 @@ userSchema.pre("aggregate", function (next) {
 userSchema.pre("save", async function (next) {
   const user = this;
 
-  // hashing password and save into DB
-  user.password = await bcrypt.hash(
-    user.password,
-    Number(config.bcrypt_salt_rounds)
-  );
-  next();
+  // Only hash the password if it has been modified (or is new)
+  if (!user.isModified("password")) {
+    return next();
+  }
+
+  if (!user.password) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Password is required");
+  }
+
+  try {
+    // Hashing password before saving it into the DB
+    const saltRounds = Number(config.bcrypt_salt_rounds);
+    if (!saltRounds) {
+      throw new AppError(
+        httpStatus.INTERNAL_SERVER_ERROR,
+        "Invalid salt rounds"
+      );
+    }
+
+    user.password = await bcrypt.hash(user.password, saltRounds);
+    next();
+  } catch (error: any) {
+    next(error);
+  }
 });
 
 // set '' after saving password

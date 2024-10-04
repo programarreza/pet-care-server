@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import {
+  createFollowingIntoDB,
   deleteUserFromDB,
   getAllUserFromDB,
   getUserProfileFromDB,
@@ -68,4 +69,24 @@ const deleteUser = catchAsync(async (req, res) => {
   });
 });
 
-export { getUserProfile, updateUserProfile, getAllUser, updateUser, deleteUser };
+const followUser = catchAsync(async (req, res) => {
+  const { userId, followingId } = req.body;
+
+  const result = await createFollowingIntoDB(userId, followingId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User followed successfully",
+    data: result,
+  });
+});
+
+export {
+  getUserProfile,
+  updateUserProfile,
+  getAllUser,
+  updateUser,
+  deleteUser,
+  followUser,
+};
