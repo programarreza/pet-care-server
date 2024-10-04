@@ -16,8 +16,19 @@ const getCommentsFromDB = async (contentId: string) => {
   }
 
   const result = await Comment.find({ content: contentId }).populate("user");
-  console.log("from service", result);
   return result;
 };
 
-export { createCommentIntoDB, getCommentsFromDB };
+const deleteCommentIntoDB = async (commentId: string) => {
+  const commentExist = await Comment.findById(commentId);
+  if (!commentExist) {
+    throw new AppError(httpStatus.NOT_FOUND, "Comment not found!😥😥");
+  }
+
+  const result = await Comment.findByIdAndDelete(commentId);
+  return result;
+};
+
+
+
+export { createCommentIntoDB, getCommentsFromDB, deleteCommentIntoDB,  };
