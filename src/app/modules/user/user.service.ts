@@ -1,8 +1,9 @@
 import httpStatus from "http-status";
 import AppError from "../../errors/AppError";
 import { User } from "./user.model";
-import { TUser } from "./user.interface";
+import { TRole, TUser } from "./user.interface";
 import mongoose from "mongoose";
+import { USER_ROLE } from "./user.constant";
 
 const getUserProfileFromDB = async (email: string) => {
   const result = await User.findOne({ email: email })
@@ -235,6 +236,26 @@ const updateUserStatusFromDB = async (id: string, status: string) => {
   return result;
 };
 
+const updateUserRoleFromDB = async (id: string, role: TRole) => {
+  const user = await User.findById(id);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found!");
+  }
+
+  // Validate role update
+  const validRoles = [USER_ROLE.USER, USER_ROLE.ADMIN];
+  if (!validRoles.includes(role)) {
+    throw new AppError(httpStatus.BAD_REQUEST, `Invalid role: ${role}`);
+  }
+
+  const result = await User.findByIdAndUpdate(
+    id,
+    { role: role },
+    { new: true }
+  );
+  return result;
+};
+
 export {
   getUserProfileFromDB,
   updateUserProfileFromDB,
@@ -245,4 +266,5 @@ export {
   unfollowUserFromDB,
   updateBlockStatusIntoDB,
   updateUserStatusFromDB,
+  updateUserRoleFromDB
 };

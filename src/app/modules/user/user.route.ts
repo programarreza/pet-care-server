@@ -11,6 +11,7 @@ import {
   updateBlockStatus,
   updateUser,
   updateUserProfile,
+  updateUserRole,
   updateUserStatus,
 } from "./user.controller";
 import { updateUserValidationSchema } from "./user.validation";
@@ -66,6 +67,12 @@ userRoutes.patch(
   "/status/:id",
   // auth(USER_ROLE.ADMIN),
   updateUserStatus
+);
+
+userRoutes.patch(
+  "/change-role/:id",
+  // auth(USER_ROLE.ADMIN),
+  updateUserRole
 );
 
 export default userRoutes;

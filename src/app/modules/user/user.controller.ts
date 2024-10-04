@@ -10,6 +10,7 @@ import {
   updateBlockStatusIntoDB,
   updateUserFromDB,
   updateUserProfileFromDB,
+  updateUserRoleFromDB,
   updateUserStatusFromDB,
 } from "./user.service";
 
@@ -127,6 +128,20 @@ const updateUserStatus = catchAsync(async (req, res) => {
   });
 });
 
+const updateUserRole = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const { role } = req.body;
+
+  const result = await updateUserRoleFromDB(id, role);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User role updated successfully!",
+    data: result,
+  });
+});
+
 export {
   getUserProfile,
   updateUserProfile,
@@ -137,4 +152,5 @@ export {
   unFollowUser,
   updateBlockStatus,
   updateUserStatus,
+  updateUserRole,
 };
