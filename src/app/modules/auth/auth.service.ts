@@ -39,6 +39,7 @@ const login = async (payload: TLoginUser) => {
     flowers: user?.flowers,
     flowing: user?.flowing,
     role: user?.role,
+    address: user?.address,
   };
 
   // create access token & send
@@ -84,6 +85,7 @@ const refreshToken = async (token: string) => {
     flowers: user?.flowers,
     flowing: user?.flowing,
     role: user?.role,
+    address: user?.address,
   };
 
   // create token and send to the client
