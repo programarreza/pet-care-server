@@ -3,8 +3,10 @@ import { multerUpload } from "../../config/multer.config";
 import validateRequest from "../../middleware/validateRequest";
 import {
   createContent,
+  downvoteContent,
   getAllContent,
   getMyContents,
+  upvoteContent,
 } from "./content.controller";
 import { createContentValidationSchema } from "./content.validation";
 import { USER_ROLE } from "../user/user.constant";
@@ -29,6 +31,18 @@ contentRoutes.get(
   "/my-contents",
   auth(USER_ROLE.USER, USER_ROLE.ADMIN),
   getMyContents
+);
+
+contentRoutes.patch(
+  "/upvote/:contentId",
+  // auth(USER_ROLE.USER, USER_ROLE.ADMIN),
+  upvoteContent
+);
+
+contentRoutes.patch(
+  "/downvote/:contentId",
+  // auth(USER_ROLE.USER, USER_ROLE.ADMIN),
+  downvoteContent
 );
 
 export default contentRoutes;

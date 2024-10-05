@@ -51,8 +51,16 @@ const contentSchema = new Schema<TContent>(
       default: false,
     },
   },
-  { timestamps: true }
+  { timestamps: true, toObject: { virtuals: true }, toJSON: { virtuals: true } }
 );
+
+// Adding the virtual field for totalVote
+contentSchema.virtual("totalVote").get(function () {
+  const upVotesCount = this.upVote.length;
+  const downVotesCount = this.downVote.length;
+  // Each upvote is counted as +1 and each downvote as -1
+  return upVotesCount - downVotesCount;
+});
 
 // Middleware to restrict access for non-admins
 function checkAccessRestrictions(this: any, next: any) {

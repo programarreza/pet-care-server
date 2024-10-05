@@ -31,14 +31,17 @@ const getAllContentFromDB = async (query: Record<string, unknown>) => {
     throw new AppError(httpStatus.NOT_FOUND, "Content not found!");
   }
 
-  return result;
+  // Convert each result to an object to include virtuals like totalVote
+  const contentWithVirtuals = result.map((content) => content.toObject());
+
+  return contentWithVirtuals;
 };
 
 const getMyContentsFromDB = async (email: string) => {
   const result = await Content.find()
     .populate({
       path: "user",
-      match: { email: email }, // Filters based on email during population
+      match: { email: email }, 
     })
     .sort({ createdAt: -1 });
 
@@ -46,7 +49,54 @@ const getMyContentsFromDB = async (email: string) => {
     throw new AppError(httpStatus.NOT_FOUND, "Content not found!");
   }
 
-  return result.filter((content) => content.user !== null); // Ensures only content with matched users is returned
+  // Filter contents with matched users and include virtuals like totalVote
+  const filteredContents = result
+    .filter((content) => content.user !== null) 
+    .map((content) => content.toObject()); 
+
+  return filteredContents;
 };
 
-export { createContentIntoDB, getAllContentFromDB, getMyContentsFromDB };
+const upvoteContentIntoDB = async (contentId: string, userId: string) => {
+  // Find the content and update it using $addToSet for upVote and $pull for downVote
+  const content = await Content.findByIdAndUpdate(
+    contentId,
+    {
+      $addToSet: { upVote: userId }, 
+      $pull: { downVote: userId }, 
+    },
+    { new: true }
+  );
+
+  if (!content) {
+    throw new AppError(httpStatus.NOT_FOUND, "Content not found!");
+  }
+
+  return content;
+};
+
+const downvoteContentIntoDB = async (contentId: string, userId: string) => {
+  // Find the content and update it using $addToSet for downVote and $pull for upVote
+  const content = await Content.findByIdAndUpdate(
+    contentId,
+    {
+      $addToSet: { downVote: userId },
+      $pull: { upVote: userId }, 
+    },
+    { new: true }
+  );
+
+  if (!content) {
+    throw new AppError(httpStatus.NOT_FOUND, "Content not found!");
+  }
+
+  return content;
+};
+
+export {
+  createContentIntoDB,
+  getAllContentFromDB,
+  getMyContentsFromDB,
+  upvoteContentIntoDB,
+  downvoteContentIntoDB,
+};

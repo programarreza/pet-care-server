@@ -3,8 +3,10 @@ import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import {
   createContentIntoDB,
+  downvoteContentIntoDB,
   getAllContentFromDB,
   getMyContentsFromDB,
+  upvoteContentIntoDB,
 } from "./content.service";
 
 const createContent = catchAsync(async (req, res) => {
@@ -44,4 +46,38 @@ const getMyContents = catchAsync(async (req, res) => {
   });
 });
 
-export { createContent, getAllContent, getMyContents };
+const upvoteContent = catchAsync(async (req, res) => {
+  const { contentId } = req.params;
+  const { userId } = req.body;
+
+  const result = await upvoteContentIntoDB(contentId, userId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Upvote successfully!",
+    data: result,
+  });
+});
+
+const downvoteContent = catchAsync(async (req, res) => {
+  const { contentId } = req.params;
+  const { userId } = req.body;
+
+  const result = await downvoteContentIntoDB(contentId, userId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Downvote successfully!",
+    data: result,
+  });
+});
+
+export {
+  createContent,
+  getAllContent,
+  getMyContents,
+  upvoteContent,
+  downvoteContent,
+};
