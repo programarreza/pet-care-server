@@ -23,7 +23,6 @@ const createPaymentIntoDB = async (payload: Record<string, unknown>) => {
     customerPhone: user.phone,
     customerAddress: user.address,
   };
-  console.log(paymentData);
 
   const orderData = {
     user: userId,
@@ -51,6 +50,7 @@ const paymentConfirmationIntoDB = async (
     console.log(verifyPaymentResponse);
 
     let payment;
+    let message;
 
     if (
       verifyPaymentResponse &&
@@ -81,7 +81,19 @@ const paymentConfirmationIntoDB = async (
       // Commit the transaction
       await session.commitTransaction();
       session.endSession();
+
+      message = "Payment Paid!";
+    } else {
+      message = "Payment Failed!";
     }
+
+    //! use html template
+    // const filePath = join(__dirname, "../../../views/confirmation.html");
+    // let template = readFileSync(filePath, "utf-8");
+
+    // template = template.replace("{{message}}", message);
+
+    // console.log({ template });
 
     return payment;
   } catch (error) {
