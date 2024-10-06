@@ -64,12 +64,15 @@ contentSchema.virtual("totalVote").get(function () {
 
 // Middleware to restrict access for non-admins
 function checkAccessRestrictions(this: any, next: any) {
-  const currentUser = this.getOptions().user; // Assuming user context is passed in options
+  // const user = {
+  //   role: "USER",
+  // };
+  // const currentUser = this.getOptions().user ; 
 
   // Non-admins can't access UNPUBLISH content or blocked/deleted users' content
-  if (currentUser?.role !== USER_ROLE.ADMIN) {
-    this.find({ status: "PUBLISH", isDeleted: { $ne: true } });
-  }
+  // if (currentUser?.role !== USER_ROLE.ADMIN) {
+  //   this.find({ status: "PUBLISH", isDeleted: { $ne: true } });
+  // }
 
   // Ensure deleted content is always excluded for all users
   this.find({ isDeleted: { $ne: true } });

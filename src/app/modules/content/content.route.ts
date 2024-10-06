@@ -6,6 +6,7 @@ import {
   downvoteContent,
   getAllContent,
   getMyContents,
+  updateStatus,
   upvoteContent,
 } from "./content.controller";
 import { createContentValidationSchema } from "./content.validation";
@@ -43,6 +44,11 @@ contentRoutes.patch(
   "/downvote/:contentId",
   // auth(USER_ROLE.USER, USER_ROLE.ADMIN),
   downvoteContent
+);
+contentRoutes.patch(
+  "/change-status/:contentId",
+  // auth(USER_ROLE.USER, USER_ROLE.ADMIN),
+  updateStatus
 );
 
 export default contentRoutes;

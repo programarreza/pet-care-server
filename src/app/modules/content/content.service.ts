@@ -1,9 +1,9 @@
 import httpStatus from "http-status";
+import { QueryBuilder } from "../../builder/QueryBuilder";
 import AppError from "../../errors/AppError";
 import { User } from "../user/user.model";
 import { TContent } from "./content.interface";
 import { Content } from "./content.model";
-import { QueryBuilder } from "../../builder/QueryBuilder";
 
 const createContentIntoDB = async (payload: TContent) => {
   const userExist = await User.findById(payload.user);
@@ -20,6 +20,7 @@ const createContentIntoDB = async (payload: TContent) => {
 
 const getAllContentFromDB = async (query: Record<string, unknown>) => {
   const itemQuery = new QueryBuilder(Content.find().populate("user"), query)
+    .search(["content"])
     .filter()
     .sort()
     .paginate()
@@ -41,7 +42,7 @@ const getMyContentsFromDB = async (email: string) => {
   const result = await Content.find()
     .populate({
       path: "user",
-      match: { email: email }, 
+      match: { email: email },
     })
     .sort({ createdAt: -1 });
 
@@ -51,8 +52,8 @@ const getMyContentsFromDB = async (email: string) => {
 
   // Filter contents with matched users and include virtuals like totalVote
   const filteredContents = result
-    .filter((content) => content.user !== null) 
-    .map((content) => content.toObject()); 
+    .filter((content) => content.user !== null)
+    .map((content) => content.toObject());
 
   return filteredContents;
 };
@@ -62,8 +63,8 @@ const upvoteContentIntoDB = async (contentId: string, userId: string) => {
   const content = await Content.findByIdAndUpdate(
     contentId,
     {
-      $addToSet: { upVote: userId }, 
-      $pull: { downVote: userId }, 
+      $addToSet: { upVote: userId },
+      $pull: { downVote: userId },
     },
     { new: true }
   );
@@ -81,7 +82,7 @@ const downvoteContentIntoDB = async (contentId: string, userId: string) => {
     contentId,
     {
       $addToSet: { downVote: userId },
-      $pull: { upVote: userId }, 
+      $pull: { upVote: userId },
     },
     { new: true }
   );
@@ -93,10 +94,31 @@ const downvoteContentIntoDB = async (contentId: string, userId: string) => {
   return content;
 };
 
+const updateStatusFromDB = async (contentId: string, status: string) => {
+  const content = await Content.findById(contentId);
+  if (!content) {
+    throw new AppError(httpStatus.NOT_FOUND, "Content not found!");
+  }
+
+  // Validate content update
+  const validStatus = ["PUBLISH", "UNPUBLISH"];
+  if (!validStatus.includes(status)) {
+    throw new AppError(httpStatus.BAD_REQUEST, `Invalid status: ${status}`);
+  }
+
+  const result = await Content.findByIdAndUpdate(
+    contentId,
+    { status: status },
+    { new: true }
+  );
+  return result;
+};
+
 export {
   createContentIntoDB,
+  downvoteContentIntoDB,
   getAllContentFromDB,
   getMyContentsFromDB,
+  updateStatusFromDB,
   upvoteContentIntoDB,
-  downvoteContentIntoDB,
 };
