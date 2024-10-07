@@ -103,7 +103,6 @@ const updateBlockStatus = catchAsync(async (req, res) => {
   const { id } = req.params;
   const { isBlock } = req.body;
 
-  console.log({ id, isBlock });
   const result = await updateBlockStatusIntoDB(id, isBlock);
 
   sendResponse(res, {

@@ -4,6 +4,7 @@ import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import {
   createPaymentIntoDB,
+  getPaymentsFromDB,
   paymentConfirmationIntoDB,
 } from "./payment.service";
 
@@ -44,4 +45,15 @@ const paymentConfirmation = catchAsync(async (req, res) => {
   });
 });
 
-export { createPayment, paymentConfirmation };
+const getPayments = catchAsync(async (req, res) => {
+  const result = await getPaymentsFromDB();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Payment is retrieved successfully",
+    data: result,
+  });
+});
+
+export { createPayment, paymentConfirmation, getPayments };

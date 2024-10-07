@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { createPayment, paymentConfirmation } from "./payment.controller";
+import {
+  createPayment,
+  getPayments,
+  paymentConfirmation,
+} from "./payment.controller";
 import validateRequest from "../../middleware/validateRequest";
 import { paymentValidationSchema } from "./payment.validation";
 
@@ -12,5 +16,6 @@ paymentRoute.post(
 );
 
 paymentRoute.post("/confirmation", paymentConfirmation);
+paymentRoute.get("/", getPayments);
 
 export { paymentRoute };

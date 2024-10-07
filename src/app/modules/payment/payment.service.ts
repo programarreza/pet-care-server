@@ -105,4 +105,9 @@ const paymentConfirmationIntoDB = async (
   }
 };
 
-export { createPaymentIntoDB, paymentConfirmationIntoDB };
+const getPaymentsFromDB = async () => {
+  const result = await Payment.find().populate("user");
+  return result;
+};
+
+export { createPaymentIntoDB, paymentConfirmationIntoDB, getPaymentsFromDB };

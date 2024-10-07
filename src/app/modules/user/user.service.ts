@@ -165,8 +165,6 @@ const unfollowUserFromDB = async (userId: string, followingId: string) => {
     const userToUnfollow =
       await User.findById(followingObjectId).session(session);
 
-    console.log({ currentUser, userToUnfollow });
-
     if (!currentUser || !userToUnfollow) {
       throw new AppError(httpStatus.NOT_FOUND, "User not found");
     }

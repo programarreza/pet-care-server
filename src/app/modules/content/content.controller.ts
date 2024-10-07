@@ -25,8 +25,6 @@ const createContent = catchAsync(async (req, res) => {
 });
 
 const getAllContent = catchAsync(async (req, res) => {
-  const user = req.user;
-  console.log({ user });
   const result = await getAllContentFromDB(req.query);
 
   sendResponse(res, {
