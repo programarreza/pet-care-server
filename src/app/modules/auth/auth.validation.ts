@@ -17,4 +17,16 @@ const refreshTokenValidationSchema = z.object({
   }),
 });
 
-export { loginUserValidationSchema, refreshTokenValidationSchema };
+const forgetPasswordValidationSchema = z.object({
+  body: z.object({
+    email: z.string({
+      required_error: "User email is required",
+    }),
+  }),
+});
+
+export {
+  loginUserValidationSchema,
+  refreshTokenValidationSchema,
+  forgetPasswordValidationSchema,
+};

@@ -18,6 +18,8 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const mongoose_1 = require("mongoose");
 const config_1 = __importDefault(require("../../config"));
 const user_constant_1 = require("./user.constant");
+const AppError_1 = __importDefault(require("../../errors/AppError"));
+const http_status_1 = __importDefault(require("http-status"));
 const userSchema = new mongoose_1.Schema({
     name: {
         type: String,
@@ -44,29 +46,78 @@ const userSchema = new mongoose_1.Schema({
     role: {
         type: String,
         default: user_constant_1.USER_ROLE.USER,
+        enum: [user_constant_1.USER_ROLE.USER, user_constant_1.USER_ROLE.ADMIN],
     },
     image: {
         type: String,
         default: null,
     },
-    isActive: {
+    status: {
+        type: String,
+        default: "BASIC",
+        enum: ["BASIC", "PREMIUM"],
+    },
+    followers: [
+        {
+            type: mongoose_1.Schema.Types.ObjectId,
+            ref: "User",
+            default: [],
+        },
+    ],
+    following: [
+        {
+            type: mongoose_1.Schema.Types.ObjectId,
+            ref: "User",
+            default: [],
+        },
+    ],
+    isBlock: {
         type: Boolean,
-        default: true,
+        default: false,
     },
     isDeleted: {
         type: Boolean,
         default: false,
     },
 }, { timestamps: true });
+// Middleware to ensure deleted users are excluded
+function checkAccessForDeletedUsers(next) {
+    // Ensure deleted users are excluded
+    this.find({ isDeleted: { $ne: true } });
+    next();
+}
+userSchema.pre("find", checkAccessForDeletedUsers);
+userSchema.pre("findOne", checkAccessForDeletedUsers);
+userSchema.pre("aggregate", function (next) {
+    // Exclude deleted users in aggregation
+    this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+    next();
+});
 userSchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
         const user = this;
-        // hashing password and save into DB
-        user.password = yield bcrypt_1.default.hash(user.password, Number(config_1.default.bcrypt_salt_rounds));
-        next();
+        // Only hash the password if it has been modified (or is new)
+        if (!user.isModified("password")) {
+            return next();
+        }
+        if (!user.password) {
+            throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Password is required");
+        }
+        try {
+            // Hashing password before saving it into the DB
+            const saltRounds = Number(config_1.default.bcrypt_salt_rounds);
+            if (!saltRounds) {
+                throw new AppError_1.default(http_status_1.default.INTERNAL_SERVER_ERROR, "Invalid salt rounds");
+            }
+            user.password = yield bcrypt_1.default.hash(user.password, saltRounds);
+            next();
+        }
+        catch (error) {
+            next(error);
+        }
     });
 });
-// set '' ofter saving password
+// Set '' after saving password
 userSchema.post("save", function (doc, next) {
     doc.password = "";
     next();
@@ -81,20 +132,4 @@ userSchema.statics.isPasswordMatched = function (plainTextPassword, hashedPasswo
         return yield bcrypt_1.default.compare(plainTextPassword, hashedPassword);
     });
 };
-userSchema.pre("find", function (next) {
-    return __awaiter(this, void 0, void 0, function* () {
-        this.find({ isDeleted: { $ne: true } });
-        next();
-    });
-});
-userSchema.pre("findOne", function (next) {
-    return __awaiter(this, void 0, void 0, function* () {
-        this.find({ isDeleted: { $ne: true } });
-        next();
-    });
-});
-userSchema.pre("aggregate", function (next) {
-    this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
-    next();
-});
 exports.User = (0, mongoose_1.model)("User", userSchema);

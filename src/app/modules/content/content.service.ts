@@ -1,9 +1,10 @@
 import httpStatus from "http-status";
-import { QueryBuilder } from "../../builder/QueryBuilder";
+// import { QueryBuilder } from "../../builder/QueryBuilder";
 import AppError from "../../errors/AppError";
 import { User } from "../user/user.model";
 import { TContent } from "./content.interface";
 import { Content } from "./content.model";
+import QueryBuilder from "../../builder/QueryBuilder";
 
 const createContentIntoDB = async (payload: TContent) => {
   const userExist = await User.findById(payload.user);
@@ -26,16 +27,17 @@ const getAllContentFromDB = async (query: Record<string, unknown>) => {
     .paginate()
     .fields();
 
-  const result = await itemQuery.modelQuery;
+  const contents = await itemQuery.modelQuery;
+  const meta = await itemQuery.countTotal();
 
-  if (!result) {
+  if (!contents) {
     throw new AppError(httpStatus.NOT_FOUND, "Content not found!");
   }
 
   // Convert each result to an object to include virtuals like totalVote
-  const contentWithVirtuals = result.map((content) => content.toObject());
+  const result = contents.map((content) => content.toObject());
 
-  return contentWithVirtuals;
+  return { result, meta };
 };
 
 const getMyContentsFromDB = async (email: string) => {

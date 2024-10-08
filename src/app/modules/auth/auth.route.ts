@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response, Router } from "express";
 import validateRequest from "../../middleware/validateRequest";
 import { createUserValidationSchema } from "../user/user.validation";
-import { login, refreshToken, signup } from "./auth.controller";
-import { loginUserValidationSchema } from "./auth.validation";
+import { forgetPassword, login, refreshToken, signup } from "./auth.controller";
+import { forgetPasswordValidationSchema, loginUserValidationSchema } from "./auth.validation";
 import { multerUpload } from "../../config/multer.config";
 
 const authRoutes = Router();
@@ -24,6 +24,12 @@ authRoutes.post(
   "/refresh-token",
   // validateRequest(refreshTokenValidationSchema),
   refreshToken
+);
+
+authRoutes.post(
+  '/forget-password',
+  validateRequest(forgetPasswordValidationSchema),
+  forgetPassword,
 );
 
 export default authRoutes;

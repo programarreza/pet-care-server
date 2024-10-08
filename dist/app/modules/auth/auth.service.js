@@ -38,30 +38,24 @@ const login = (payload) => __awaiter(void 0, void 0, void 0, function* () {
         throw new AppError_1.default(http_status_1.default.FORBIDDEN, "Password do not matched!!");
     }
     const jwtPayload = {
+        id: user === null || user === void 0 ? void 0 : user._id,
         name: user === null || user === void 0 ? void 0 : user.name,
         email: user === null || user === void 0 ? void 0 : user.email,
         phone: user === null || user === void 0 ? void 0 : user.phone,
         image: user === null || user === void 0 ? void 0 : user.image,
-        isActive: user === null || user === void 0 ? void 0 : user.isActive,
+        status: user === null || user === void 0 ? void 0 : user.status,
+        followers: user === null || user === void 0 ? void 0 : user.followers,
+        following: user === null || user === void 0 ? void 0 : user.following,
         role: user === null || user === void 0 ? void 0 : user.role,
+        address: user === null || user === void 0 ? void 0 : user.address,
     };
     // create access token & send
     const accessToken = (0, auth_utils_2.createToken)(jwtPayload, config_1.default.jwt_access_secret, config_1.default.jwt_access_expires_in);
     // create refresh token
     const refreshToken = (0, auth_utils_2.createToken)(jwtPayload, config_1.default.jwt_refresh_secret, config_1.default.jwt_refresh_expires_in);
-    // Create a new object without including the password field
-    const userData = {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        address: user.address,
-        role: user.role,
-    };
     return {
         accessToken,
         refreshToken,
-        user: userData,
     };
 });
 const refreshToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
@@ -74,12 +68,16 @@ const refreshToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, "This user is not found!");
     }
     const jwtPayload = {
+        id: user === null || user === void 0 ? void 0 : user._id,
         name: user === null || user === void 0 ? void 0 : user.name,
         email: user === null || user === void 0 ? void 0 : user.email,
         phone: user === null || user === void 0 ? void 0 : user.phone,
         image: user === null || user === void 0 ? void 0 : user.image,
-        isActive: user === null || user === void 0 ? void 0 : user.isActive,
+        status: user === null || user === void 0 ? void 0 : user.status,
+        followers: user === null || user === void 0 ? void 0 : user.followers,
+        following: user === null || user === void 0 ? void 0 : user.following,
         role: user === null || user === void 0 ? void 0 : user.role,
+        address: user === null || user === void 0 ? void 0 : user.address,
     };
     // create token and send to the client
     const accessToken = (0, auth_utils_2.createToken)(jwtPayload, config_1.default.jwt_access_secret, config_1.default.jwt_access_expires_in);

@@ -47,7 +47,6 @@ const paymentConfirmationIntoDB = async (
   try {
     // verify payment
     const verifyPaymentResponse = await verifyPayment(transactionId);
-    console.log(verifyPaymentResponse);
 
     let payment;
     let message;
