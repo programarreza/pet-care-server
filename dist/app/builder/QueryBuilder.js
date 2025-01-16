@@ -1,6 +1,4 @@
 "use strict";
-// /* eslint-disable prefer-const */
-// import { FilterQuery, Query } from 'mongoose';
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -38,7 +36,8 @@ class QueryBuilder {
         const excludeFields = ["searchTerm", "sort", "limit", "page", "fields"];
         excludeFields.forEach((el) => delete queryObj[el]);
         // Handle `availableAreas` as an array of values
-        if (queryObj.availableAreas && typeof queryObj.availableAreas === "string") {
+        if (queryObj.availableAreas &&
+            typeof queryObj.availableAreas === "string") {
             const areasArray = queryObj.availableAreas.split(" ");
             queryObj.availableAreas = { $in: areasArray };
         }

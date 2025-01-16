@@ -1,10 +1,9 @@
 import httpStatus from "http-status";
-// import { QueryBuilder } from "../../builder/QueryBuilder";
+import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../errors/AppError";
 import { User } from "../user/user.model";
 import { TContent } from "./content.interface";
 import { Content } from "./content.model";
-import QueryBuilder from "../../builder/QueryBuilder";
 
 const createContentIntoDB = async (payload: TContent) => {
   const userExist = await User.findById(payload.user);
@@ -19,8 +18,36 @@ const createContentIntoDB = async (payload: TContent) => {
   return populateContent;
 };
 
+const updateContentIntoDB = async (payload: Partial<TContent>, id: string) => {
+  // Check if the user exists
+  const userExist = await User.findById(payload.user);
+  if (!userExist) {
+    throw new AppError(httpStatus.NOT_FOUND, "This user not found");
+  }
+
+  // Update the content by ID
+  const content = await Content.updateOne(
+    { _id: id },
+    { $set: payload },
+    { runValidators: true }
+  );
+
+  // If no content was updated, throw an error
+  if (content.modifiedCount === 0) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Content not found or no changes made"
+    );
+  }
+
+  return content;
+};
+
 const getAllContentFromDB = async (query: Record<string, unknown>) => {
-  const itemQuery = new QueryBuilder(Content.find().populate("user"), query)
+  const itemQuery = new QueryBuilder(
+    Content.find({ status: "PUBLISH", isDeleted: false }).populate("user"),
+    query
+  )
     .search(["content"])
     .filter()
     .sort()
@@ -121,6 +148,7 @@ export {
   downvoteContentIntoDB,
   getAllContentFromDB,
   getMyContentsFromDB,
+  updateContentIntoDB,
   updateStatusFromDB,
   upvoteContentIntoDB,
 };

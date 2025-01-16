@@ -1,6 +1,7 @@
-import { Schema, Types, model } from "mongoose";
-import { TContent } from "./content.interface";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Schema, model } from "mongoose";
 import { USER_ROLE } from "../user/user.constant";
+import { TContent } from "./content.interface";
 
 const contentSchema = new Schema<TContent>(
   {
@@ -67,7 +68,7 @@ function checkAccessRestrictions(this: any, next: any) {
   // const user = {
   //   role: "USER",
   // };
-  // const currentUser = this.getOptions().user ; 
+  // const currentUser = this.getOptions().user ;
 
   // Non-admins can't access UNPUBLISH content or blocked/deleted users' content
   // if (currentUser?.role !== USER_ROLE.ADMIN) {

@@ -6,6 +6,7 @@ import {
   downvoteContentIntoDB,
   getAllContentFromDB,
   getMyContentsFromDB,
+  updateContentIntoDB,
   updateStatusFromDB,
   upvoteContentIntoDB,
 } from "./content.service";
@@ -20,6 +21,21 @@ const createContent = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: "Content post successfully",
+    data: result,
+  });
+});
+
+const updateContent = catchAsync(async (req, res) => {
+  const {id} = req.params;
+  const result = await updateContentIntoDB({
+    ...req.body,
+    image: req.file?.path,
+  }, id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Content updated successfully",
     data: result,
   });
 });
@@ -91,9 +107,10 @@ const updateStatus = catchAsync(async (req, res) => {
 
 export {
   createContent,
+  downvoteContent,
   getAllContent,
   getMyContents,
-  upvoteContent,
-  downvoteContent,
+  updateContent,
   updateStatus,
+  upvoteContent,
 };

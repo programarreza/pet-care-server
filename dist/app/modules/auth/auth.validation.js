@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.refreshTokenValidationSchema = exports.loginUserValidationSchema = void 0;
+exports.forgetPasswordValidationSchema = exports.refreshTokenValidationSchema = exports.loginUserValidationSchema = void 0;
 const zod_1 = require("zod");
 const loginUserValidationSchema = zod_1.z.object({
     body: zod_1.z.object({
@@ -19,3 +19,11 @@ const refreshTokenValidationSchema = zod_1.z.object({
     }),
 });
 exports.refreshTokenValidationSchema = refreshTokenValidationSchema;
+const forgetPasswordValidationSchema = zod_1.z.object({
+    body: zod_1.z.object({
+        email: zod_1.z.string({
+            required_error: "User email is required",
+        }),
+    }),
+});
+exports.forgetPasswordValidationSchema = forgetPasswordValidationSchema;

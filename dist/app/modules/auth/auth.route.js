@@ -18,4 +18,5 @@ authRoutes.post("/login", (0, validateRequest_1.default)(auth_validation_1.login
 authRoutes.post("/refresh-token", 
 // validateRequest(refreshTokenValidationSchema),
 auth_controller_1.refreshToken);
+authRoutes.post('/forget-password', (0, validateRequest_1.default)(auth_validation_1.forgetPasswordValidationSchema), auth_controller_1.forgetPassword);
 exports.default = authRoutes;

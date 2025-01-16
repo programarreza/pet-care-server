@@ -24,4 +24,5 @@ exports.default = {
     base_url: process.env.BASE_URL,
     client_url: process.env.CLIENT_URL,
     payment_verify_url: process.env.PAYMENT_VERIFY_URL,
+    reset_password_ui_link: process.env.RESET_PASSWORD_UI_LINK,
 };
